@@ -152,12 +152,21 @@ def sidebar_brand():
                 st.session_state["_api_test_msg"] = str(_e)
         _api_res = st.session_state.get("_api_test_result")
         _api_msg = st.session_state.get("_api_test_msg", "")
+        _is_network_err = "APIConnectionError" in _api_msg or "Connection error" in _api_msg
         if _api_res == "ok":
             st.success("Resposta da API: OK ✅")
         elif _api_res == "fail":
-            st.error("Sem Conexão com a API")
-            if _api_msg:
-                st.caption(f"Detalhe: {_api_msg}")
+            if _is_network_err:
+                st.warning(
+                    "⚠️ API disponível apenas na rede Petrobras.  \n"
+                    "A funcionalidade de IA está desabilitada no Streamlit Cloud "
+                    "pois o gateway `apit.petrobras.com.br` só é acessível "
+                    "dentro da rede corporativa."
+                )
+            else:
+                st.error("Sem Conexão com a API")
+                if _api_msg:
+                    st.caption(f"Detalhe: {_api_msg}")
         st.markdown("</div>", unsafe_allow_html=True)
 
         # ── Usuário logado + botão de logout ─────────────────────────────

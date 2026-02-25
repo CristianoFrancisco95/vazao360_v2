@@ -306,6 +306,52 @@ if uploaded is not None:
             st.session_state["_dbg_result"] = _dbg_result
             st.rerun()
 
+    with col_ai:
+        # Verifica se a API está acessível (resultado cacheado na sessão)
+        _ai_status   = st.session_state.get("_api_test_result")
+        _ai_msg      = st.session_state.get("_api_test_msg", "")
+        _ai_net_err  = "APIConnectionError" in _ai_msg or "Connection error" in _ai_msg
+        _ai_no_key   = not openai_configured()
+        _ai_blocked  = _ai_net_err or (_ai_status == "fail" and not _ai_net_err)
+
+        if _ai_no_key:
+            st.button(
+                "🤖 IA — API não configurada",
+                disabled=True,
+                key="dbg_process_ai",
+                help="Configure OPENAI_API_KEY nos Secrets do Streamlit Cloud.",
+            )
+        elif _ai_net_err:
+            st.button(
+                "🤖 IA — indisponível fora da rede Petrobras",
+                disabled=True,
+                key="dbg_process_ai",
+                help=(
+                    "O gateway apit.petrobras.com.br só é acessível dentro da rede "
+                    "corporativa Petrobras. Use o modo Manual (📐) ou acesse o sistema "
+                    "por um servidor interno Petrobras."
+                ),
+            )
+            st.caption(
+                "ℹ️ Modo IA disponível apenas na rede Petrobras.",
+            )
+        else:
+            if st.button(
+                "🤖 Processar com IA (OpenAI Vision)",
+                disabled=False,
+                type="secondary",
+                key="dbg_process_ai",
+                help="Envia a imagem para a IA segmentar o furo automaticamente.",
+            ):
+                with st.spinner("IA analisando a imagem…"):
+                    _dbg_result = process_uploaded_image_openai(
+                        img_bytes,
+                        marker_size_mm=marker_mm,
+                        manual_polygon=None,
+                    )
+                st.session_state["_dbg_result"] = _dbg_result
+                st.rerun()
+
 
 
 # ── Resultado ──────────────────────────────────────────────────────────────────

@@ -51,12 +51,10 @@ def configurar_proxy_petrobras(username: str, password: str) -> "httpx.Client | 
     if not _HTTPX_AVAILABLE:
         return None
 
-    proxies = {
-        "http://":  proxy_url,
-        "https://": proxy_url,
-    }
+    # As variáveis HTTP_PROXY / HTTPS_PROXY já foram definidas acima.
+    # Deixamos o httpx lê-las via trust_env=True (padrão), evitando o parâmetro
+    # `proxies=` que foi removido no httpx >= 0.28.0.
     http_client = httpx.Client(
-        proxies=proxies,
         verify=False,       # certificados corporativos internos
         timeout=10.0,
     )

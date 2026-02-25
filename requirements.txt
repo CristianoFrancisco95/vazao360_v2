@@ -1,9 +1,24 @@
-streamlit==1.31.0
-requests>=2.31.0
-certifi>=2023.7.22
-python-dotenv==1.0.0
-langchain==0.1.9
-chromadb==0.4.22
-pypdf==4.0.1
-pandas==2.2.0
-plotly==5.18.0
+# ── Framework principal ───────────────────────────────────────────────────────
+streamlit>=1.37.0
+
+# ── Dados e visualização ──────────────────────────────────────────────────────
+pandas>=2.2.2
+numpy>=1.26
+altair>=5.0.0
+
+# ── Modelos e validação ───────────────────────────────────────────────────────
+pydantic>=2.7.0
+
+# ── Visão computacional ───────────────────────────────────────────────────────
+opencv-contrib-python-headless>=4.7.0
+Pillow>=9.0.0
+streamlit-image-coordinates>=0.1.3
+
+# ── Física / unidades / termodinâmica ─────────────────────────────────────────
+PyYAML>=6.0
+pint>=0.23
+
+# ── Integrações externas ──────────────────────────────────────────────────────
+openai>=1.0.0
+httpx>=0.27.0
+python-dotenv>=1.0.0

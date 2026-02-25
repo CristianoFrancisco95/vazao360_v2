@@ -143,11 +143,10 @@ def _get_client():
         else:
             _verify = False  # sem CA: desativa verificação (rede corporativa)
 
-        # trust_env=True faz o httpx ler HTTP_PROXY/HTTPS_PROXY E NO_PROXY do ambiente.
-        # auth.py define NO_PROXY="...petrobras.com.br,..." portanto apit.petrobras.com.br
-        # (URL interna) será automaticamente excluída do proxy de internet.
-        # Não passar proxies explicitamente evita sobrescrever o NO_PROXY.
-        _http_client = _httpx.Client(verify=_verify, timeout=90.0, trust_env=True)
+        # trust_env=False: ignora HTTP_PROXY/HTTPS_PROXY definidos pelo auth.py
+        # (proxy corporativo Petrobras), pois as chamadas à API OpenAI devem ir
+        # diretamente à internet, tanto no Streamlit Cloud quanto em rede externa.
+        _http_client = _httpx.Client(verify=_verify, timeout=90.0, trust_env=False)
     except ImportError:
         pass  # httpx nao disponível — openai usa urllib
 
@@ -353,8 +352,15 @@ def openai_error_message() -> str:
     return ""
 
 
-def test_api_connection() -> bool:
-    """Faz uma chamada mínima de chat completions e retorna True se bem-sucedida."""
+def test_api_connection() -> tuple[bool, str]:
+    """
+    Faz uma chamada mínima de chat completions.
+    Retorna (True, "") em sucesso ou (False, mensagem_de_erro) em falha.
+    """
+    if not _OPENAI_SDK_AVAILABLE:
+        return False, "Biblioteca 'openai' não instalada."
+    if not os.getenv("OPENAI_API_KEY", "").strip():
+        return False, "OPENAI_API_KEY não configurada nos Secrets do Streamlit Cloud."
     try:
         client = _get_client()
         dep = os.getenv("DEPLOYMENT") or os.getenv("MODEL", "gpt-4o-mini")
@@ -363,6 +369,6 @@ def test_api_connection() -> bool:
             messages=[{"role": "user", "content": "ping"}],
             max_tokens=1,
         )
-        return True
-    except Exception:
-        return False
+        return True, ""
+    except Exception as exc:
+        return False, f"{type(exc).__name__}: {exc}"

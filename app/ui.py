@@ -144,14 +144,20 @@ def sidebar_brand():
         if st.button("🔌 Testar conectividade da IA", key="btn_test_api", width="stretch"):
             try:
                 from app.integrations.openai_vision import test_api_connection
-                st.session_state["_api_test_result"] = "ok" if test_api_connection() else "fail"
-            except Exception:
+                _ok, _err = test_api_connection()
+                st.session_state["_api_test_result"] = "ok" if _ok else "fail"
+                st.session_state["_api_test_msg"] = _err
+            except Exception as _e:
                 st.session_state["_api_test_result"] = "fail"
+                st.session_state["_api_test_msg"] = str(_e)
         _api_res = st.session_state.get("_api_test_result")
+        _api_msg = st.session_state.get("_api_test_msg", "")
         if _api_res == "ok":
-            st.success("Resposta da API: OK")
+            st.success("Resposta da API: OK ✅")
         elif _api_res == "fail":
-            st.error("Resposta da API: Sem Conexão")
+            st.error("Sem Conexão com a API")
+            if _api_msg:
+                st.caption(f"Detalhe: {_api_msg}")
         st.markdown("</div>", unsafe_allow_html=True)
 
         # ── Usuário logado + botão de logout ─────────────────────────────

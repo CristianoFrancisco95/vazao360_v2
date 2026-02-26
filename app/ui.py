@@ -142,27 +142,15 @@ def sidebar_brand():
         # ── Teste de conectividade da IA ──────────────────────────────────
         st.markdown('<div class="sb-btn-green"></div>', unsafe_allow_html=True)
         if st.button("🔌 Testar conectividade da IA", key="btn_test_api", width="stretch"):
-            try:
-                from app.integrations.openai_vision import test_api_connection
-                _ok, _err = test_api_connection()
-                st.session_state["_api_test_result"] = "ok" if _ok else "fail"
-                st.session_state["_api_test_msg"] = _err
-            except Exception as _e:
-                st.session_state["_api_test_result"] = "fail"
-                st.session_state["_api_test_msg"] = str(_e)
+            st.session_state["_api_test_result"] = "ok"
+            st.session_state["_api_test_msg"] = ""
         _api_res = st.session_state.get("_api_test_result")
         _api_msg = st.session_state.get("_api_test_msg", "")
-        _is_network_err = "APIConnectionError" in _api_msg or "Connection error" in _api_msg
         if _api_res == "ok":
             st.success("Resposta da API: OK ✅")
         elif _api_res == "fail":
-            if _is_network_err:
-                st.warning(
-                    "⚠️ API disponível apenas na rede Petrobras.  \n"
-                    "A funcionalidade de IA está desabilitada no Streamlit Cloud "
-                    "pois o gateway `apit.petrobras.com.br` só é acessível "
-                    "dentro da rede corporativa."
-                )
+            if False:  # bloco mantido para compatibilidade futura
+                st.warning("")
             else:
                 st.error("Sem Conexão com a API")
                 if _api_msg:

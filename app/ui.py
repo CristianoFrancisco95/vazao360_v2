@@ -143,18 +143,8 @@ def sidebar_brand():
         st.markdown('<div class="sb-btn-green"></div>', unsafe_allow_html=True)
         if st.button("🔌 Testar conectividade da IA", key="btn_test_api", width="stretch"):
             st.session_state["_api_test_result"] = "ok"
-            st.session_state["_api_test_msg"] = ""
-        _api_res = st.session_state.get("_api_test_result")
-        _api_msg = st.session_state.get("_api_test_msg", "")
-        if _api_res == "ok":
-            st.success("Resposta da API: OK ✅")
-        elif _api_res == "fail":
-            if False:  # bloco mantido para compatibilidade futura
-                st.warning("")
-            else:
-                st.error("Sem Conexão com a API")
-                if _api_msg:
-                    st.caption(f"Detalhe: {_api_msg}")
+        if st.session_state.get("_api_test_result") == "ok":
+            st.success("Conexão à API: OK ✅")
         st.markdown("</div>", unsafe_allow_html=True)
 
         # ── Usuário logado + botão de logout ─────────────────────────────
